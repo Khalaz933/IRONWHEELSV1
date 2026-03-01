@@ -1818,56 +1818,44 @@ function render(){
     fab.style.display='flex';
     bakFab.classList.add('visible');
     app.innerHTML=renderBlocks();
-    // Attach events via delegation — fixes iOS touch issues
-    app.querySelectorAll('.blk-card').forEach(card=>{
+    app.querySelectorAll('[data-edit-bid]').forEach(btn=>{
+      const bid=btn.dataset.editBid;
+      ['click','touchend'].forEach(ev=>btn.addEventListener(ev,function(e){
+        e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+        openEditBlock(bid);
+      },{passive:false}));
+    });
+    app.querySelectorAll('[data-bid]').forEach(card=>{
       const bid=card.dataset.bid;
       card.addEventListener('click',function(e){
-        if(e.target.closest('.card-edit-btn'))return;
+        if(e.target.closest('[data-edit-bid]'))return;
         goBlock(bid);
       });
-      const editBtn=card.querySelector('.card-edit-btn');
-      if(editBtn){
-        editBtn.addEventListener('click',function(e){
-          e.stopPropagation();
-          openEditBlock(bid);
-        });
-        editBtn.addEventListener('touchend',function(e){
-          e.preventDefault();
-          e.stopPropagation();
-          openEditBlock(bid);
-        });
-      }
     });
   } else if(VIEW==='weeks'){
     fab.style.display='flex';
     bakFab.classList.add('visible');
     app.innerHTML=renderWeeks();
-    // Attach events via delegation
-    app.querySelectorAll('.wk-card').forEach(card=>{
+    app.querySelectorAll('[data-edit-wk]').forEach(btn=>{
+      const w=+btn.dataset.editWk;
+      ['click','touchend'].forEach(ev=>btn.addEventListener(ev,function(e){
+        e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+        openEditWeek(w);
+      },{passive:false}));
+    });
+    app.querySelectorAll('[data-wk]').forEach(card=>{
       const w=+card.dataset.wk;
       card.addEventListener('click',function(e){
-        if(e.target.closest('.card-edit-btn')||e.target.closest('.wk-export-btn'))return;
+        if(e.target.closest('[data-edit-wk]')||e.target.closest('[data-exp-wk]'))return;
         goDays(w);
       });
-      const editBtn=card.querySelector('.card-edit-btn');
-      if(editBtn){
-        editBtn.addEventListener('click',function(e){
-          e.stopPropagation();
-          openEditWeek(w);
-        });
-        editBtn.addEventListener('touchend',function(e){
-          e.preventDefault();
-          e.stopPropagation();
-          openEditWeek(w);
-        });
-      }
-      const expBtn=card.querySelector('.wk-export-btn');
-      if(expBtn){
-        expBtn.addEventListener('click',function(e){
-          e.stopPropagation();
-          openExp(w);
-        });
-      }
+    });
+    app.querySelectorAll('[data-exp-wk]').forEach(btn=>{
+      const w=+btn.dataset.expWk;
+      ['click','touchend'].forEach(ev=>btn.addEventListener(ev,function(e){
+        e.preventDefault();e.stopPropagation();
+        openExp(w);
+      },{passive:false}));
     });
   } else if(VIEW==='days'){
     fab.style.display='none';
@@ -1916,7 +1904,7 @@ function renderBlocks(){
           <div class="blk-bar"><div class="blk-bar-fill" style="width:${pct}%"></div></div>
         </div>`:''}
       </div>
-      <button class="card-edit-btn" data-edit-bid="${bid}">···</button>
+      <div class="card-edit-btn" data-edit-bid="${bid}">···</div>
     </div>`;
   });
   return h+'</div>';
@@ -1974,7 +1962,7 @@ function renderWeeks(){
             </div>`}
         <button class="wk-export-btn" data-exp-wk="${w}">Export</button>
       </div>
-      <button class="card-edit-btn" data-edit-wk="${w}" style="margin-left:4px;">···</button>
+      <div class="card-edit-btn" data-edit-wk="${w}">···</div>
     </div>`;
   }
   return h+'</div>';
